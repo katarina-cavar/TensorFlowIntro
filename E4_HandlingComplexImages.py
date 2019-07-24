@@ -30,22 +30,36 @@ callbacks = myCallback()
 
 # Defining and Compiling the Model
 model = tf.keras.models.Sequential([
-	# add code
+    tf.keras.layers.Conv2D(16, (3,3), activation='relu', input_shape=(150, 150, 3)),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2),
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 from tensorflow.keras.optimizers import RMSprop
 
-model.compile("...add code ... ")
+model.compile(loss='binary_crossentropy',
+              optimizer=RMSprop(lr=0.001),
+              metrics=['acc'])
+
 
 # This code block should create an instance of an ImageDataGenerator called train_datagen 
 # And a train_generator by calling train_datagen.flow_from_directory
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-train_datagen = # Your Code Here
+train_datagen = ImageDataGenerator(rescale=1/255)
 
 train_generator = train_datagen.flow_from_directory(
-        # Your Code Here)
+        "/tmp/h-or-s",  
+        target_size=(150, 150), 
+        batch_size=10,
+        class_mode='binary')
 
 # Expected output: 'Found 80 images belonging to 2 classes'
 
@@ -53,6 +67,10 @@ train_generator = train_datagen.flow_from_directory(
 # This code block should call model.fit_generator and train for
 # a number of epochs. 
 history = model.fit_generator(
-      # Your Code Here)
+      train_generator,
+      steps_per_epoch=2,  
+      epochs=15,
+      verbose=1,
+      callbacks=[callbacks])
     
 # Expected output: "Reached 99.9% accuracy so cancelling training!""
